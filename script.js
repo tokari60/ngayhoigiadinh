@@ -1,96 +1,160 @@
-const gallery = document.getElementById("heart-gallery");
-const lightbox = document.getElementById("lightbox");
-const lightboxImg = document.getElementById("lightbox-img");
-const closeBtn = document.querySelector(".close");
-const prevBtn = document.querySelector(".prev");
-const nextBtn = document.querySelector(".next");
-const music = document.getElementById("bgMusic");
-const musicBtn = document.getElementById("music-btn");
-const images = [];
-let currentIndex = 0;
+document.addEventListener("DOMContentLoaded", () => {
 
-// Hình trái tim
-const heart = [
-"0000000000000000000",
-"0000111100011110000",
-"0001111110111111000",
-"0011111111111111100",
-"0111111111111111110",
-"1111111111111111111",
-"1111111111111111111",
-"1111111111111111111",
-"0111111111111111110",
-"0011111111111111100",
-"0001111111111111000",
-"0000111111111110000",
-"0000011111111100000",
-"0000001111111000000",
-"0000000111110000000",
-"0000000011100000000",
-"0000000001000000000"
-];
+    const gallery = document.getElementById("heart-gallery");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img");
+    const closeBtn = document.querySelector(".close");
+    const prevBtn = document.querySelector(".prev");
+    const nextBtn = document.querySelector(".next");
 
-let count = 1;
+    const music = document.getElementById("bgMusic");
+    const musicBtn = document.getElementById("music-btn");
 
-// ===================
-// Tạo Gallery
-// ===================
-heart.forEach(row => {
+    const preview = document.getElementById("hover-preview");
+    const previewImg = document.getElementById("preview-img");
 
-    for (const cell of row) {
+    const images = [];
+    let currentIndex = 0;
 
-        const item = document.createElement("div");
+    // ==========================
+    // Shape trái tim
+    // ==========================
 
-        if (cell === "1") {
+    const heart = [
+        "0000000000000000000",
+        "0000111100011110000",
+        "0001111110111111000",
+        "0011111111111111100",
+        "0111111111111111110",
+        "1111111111111111111",
+        "1111111111111111111",
+        "1111111111111111111",
+        "0111111111111111110",
+        "0011111111111111100",
+        "0001111111111111000",
+        "0000111111111110000",
+        "0000011111111100000",
+        "0000001111111000000",
+        "0000000111110000000",
+        "0000000011100000000",
+        "0000000001000000000"
+    ];
 
-            item.className = "photo";
+    let count = 1;
 
-            const img = document.createElement("img");
+    // ==========================
+    // Gallery
+    // ==========================
 
-            img.src = `images/${count}.jpg`;
-            img.alt = `Ảnh ${count}`;
+    heart.forEach(row => {
 
-            // Nếu thiếu ảnh
-            img.onerror = () => {
-                img.src = "images/default.jpg";
-            };
+        [...row].forEach(cell => {
 
-            images.push(img.src);
+            const item = document.createElement("div");
 
-            item.appendChild(img);
+            if (cell === "1") {
 
-            item.addEventListener("click", () => {
+                item.className = "photo";
+                item.style.animationDelay = `${count * 0.02}s`;
 
-                currentIndex = images.indexOf(img.src);
+                const img = document.createElement("img");
 
-                if (lightbox && lightboxImg) {
+                const imagePath = `images/${count}.jpg`;
+
+                img.src = imagePath;
+                img.alt = `Ảnh ${count}`;
+
+                img.onerror = () => {
+                    img.onerror = null;
+                    img.src = "images/default.jpg";
+                };
+
+                const imageIndex = images.length;
+                images.push(imagePath);
+
+                item.appendChild(img);
+
+                // Hover Preview
+                item.addEventListener("mouseenter", () => {
+
+                    preview.style.display = "block";
+                    previewImg.src = imagePath;
+
+                });
+
+                item.addEventListener("mousemove", (e) => {
+
+                    let left = e.clientX + 25;
+                    let top = e.clientY - 150;
+
+                    if (left + 320 > window.innerWidth) {
+                        left = e.clientX - 330;
+                    }
+
+                    if (top < 10) {
+                        top = 10;
+                    }
+
+                    preview.style.left = left + "px";
+                    preview.style.top = top + "px";
+
+                });
+
+                item.addEventListener("mouseleave", () => {
+
+                    preview.style.display = "none";
+
+                });
+
+                // Click mở Lightbox
+                item.addEventListener("click", () => {
+
+                    currentIndex = imageIndex;
+
                     lightbox.style.display = "flex";
                     lightboxImg.src = images[currentIndex];
-                }
 
-            });
+                });
 
-            count++;
+                count++;
 
-        } else {
+            } else {
 
-            item.className = "empty";
+                item.className = "empty";
 
-        }
+            }
 
-        gallery.appendChild(item);
+            gallery.appendChild(item);
+
+        });
+
+    });
+
+    // ==========================
+    // Lightbox
+    // ==========================
+
+    function showPrev() {
+
+        currentIndex--;
+
+        if (currentIndex < 0)
+            currentIndex = images.length - 1;
+
+        lightboxImg.src = images[currentIndex];
 
     }
 
-});
+    function showNext() {
 
-console.log("Tổng số ảnh:", count - 1);
+        currentIndex++;
 
-// ===================
-// Lightbox
-// ===================
+        if (currentIndex >= images.length)
+            currentIndex = 0;
 
-if (closeBtn) {
+        lightboxImg.src = images[currentIndex];
+
+    }
 
     closeBtn.addEventListener("click", () => {
 
@@ -98,143 +162,75 @@ if (closeBtn) {
 
     });
 
-}
+    lightbox.addEventListener("click", e => {
 
-if (lightbox) {
-
-    lightbox.addEventListener("click", (e) => {
-
-        if (e.target === lightbox) {
-
+        if (e.target === lightbox)
             lightbox.style.display = "none";
-
-        }
 
     });
 
-}
+    prevBtn.addEventListener("click", e => {
 
-// ===================
-// Ảnh trước
-// ===================
+        e.stopPropagation();
+        showPrev();
 
-function showPrev() {
+    });
 
-    currentIndex--;
+    nextBtn.addEventListener("click", e => {
 
-    if (currentIndex < 0) {
+        e.stopPropagation();
+        showNext();
 
-        currentIndex = images.length - 1;
+    });
 
-    }
+    document.addEventListener("keydown", e => {
 
-    lightboxImg.src = images[currentIndex];
+        if (lightbox.style.display !== "flex") return;
 
-}
+        if (e.key === "ArrowLeft") showPrev();
 
-// ===================
-// Ảnh sau
-// ===================
+        if (e.key === "ArrowRight") showNext();
 
-function showNext() {
-
-    currentIndex++;
-
-    if (currentIndex >= images.length) {
-
-        currentIndex = 0;
-
-    }
-
-    lightboxImg.src = images[currentIndex];
-
-}
-
-if (prevBtn) {
-
-    prevBtn.addEventListener("click", showPrev);
-
-}
-
-if (nextBtn) {
-
-    nextBtn.addEventListener("click", showNext);
-
-}
-
-// ===================
-// Điều khiển bàn phím
-// ===================
-
-document.addEventListener("keydown", (e) => {
-
-    if (!lightbox || lightbox.style.display !== "flex") return;
-
-    switch (e.key) {
-
-        case "ArrowLeft":
-            showPrev();
-            break;
-
-        case "ArrowRight":
-            showNext();
-            break;
-
-        case "Escape":
+        if (e.key === "Escape")
             lightbox.style.display = "none";
-            break;
 
-    }
+    });
 
-});
+    // ==========================
+    // Music
+    // ==========================
 
-// ===================
-// Music
-// ===================
+    musicBtn.addEventListener("click", e => {
 
-if (music && musicBtn) {
-
-    musicBtn.addEventListener("click", () => {
+        e.stopPropagation();
 
         if (music.paused) {
 
-            music.play()
-                .then(() => {
+            music.play();
 
-                    musicBtn.innerHTML = "⏸ Pause";
-
-                })
-                .catch(err => {
-
-                    console.log("Không thể phát nhạc:", err);
-
-                });
+            musicBtn.textContent = "⏸ Pause";
 
         } else {
 
             music.pause();
 
-            musicBtn.innerHTML = "🎵 Play";
+            musicBtn.textContent = "🎵 Play Music";
 
         }
 
     });
 
-    // Tự phát sau lần click đầu tiên
     document.addEventListener("click", () => {
 
         if (music.paused) {
 
-            music.play()
-                .then(() => {
+            music.play().catch(() => {});
 
-                    musicBtn.innerHTML = "⏸ Pause";
-
-                })
-                .catch(() => {});
+            musicBtn.textContent = "⏸ Pause";
 
         }
 
     }, { once: true });
 
-}
+});
+
