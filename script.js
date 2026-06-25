@@ -59,14 +59,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const img = document.createElement("img");
 
-                const imagePath = `images/${count}.jpg`;
+                const imagePath = `images/${count}.JPG`;
 
                 img.src = imagePath;
                 img.alt = `Ảnh ${count}`;
 
                 img.onerror = () => {
                     img.onerror = null;
-                    img.src = "images/default.jpg";
+                    img.src = "images/default.JPG";
                 };
 
                 const imageIndex = images.length;
