@@ -75,36 +75,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 item.appendChild(img);
 
                 // Hover Preview
-                item.addEventListener("mouseenter", () => {
+               // Chỉ dùng Hover Preview trên máy tính
+if (window.matchMedia("(hover: hover)").matches) {
 
-                    preview.style.display = "block";
-                    previewImg.src = imagePath;
+    item.addEventListener("mouseenter", () => {
 
-                });
+        preview.style.display = "block";
+        previewImg.src = imagePath;
 
-                item.addEventListener("mousemove", (e) => {
+    });
 
-                    let left = e.clientX + 25;
-                    let top = e.clientY - 150;
+    item.addEventListener("mousemove", (e) => {
 
-                    if (left + 320 > window.innerWidth) {
-                        left = e.clientX - 330;
-                    }
+        let left = e.clientX - 160;
+        let top = e.clientY - 170;
 
-                    if (top < 10) {
-                        top = 10;
-                    }
+        preview.style.left = left + "px";
+        preview.style.top = top + "px";
 
-                    preview.style.left = left + "px";
-                    preview.style.top = top + "px";
+    });
 
-                });
+    item.addEventListener("mouseleave", () => {
 
-                item.addEventListener("mouseleave", () => {
+        preview.style.display = "none";
 
-                    preview.style.display = "none";
+    });
 
-                });
+}
 
                 // Click mở Lightbox
                 item.addEventListener("click", () => {
